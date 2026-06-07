@@ -4,6 +4,9 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     public float thrustForce = 1f;
+    public float maxThrust = 5f;
+    public GameObject boosterFlame;
+
     Rigidbody2D rb;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -23,6 +26,20 @@ public class PlayerController : MonoBehaviour
             // Move player in direction of mouse
             transform.up = direction;
             rb.AddForce(direction * thrustForce);
+
+            if (rb.linearVelocity.magnitude > maxThrust)
+            {
+                rb.linearVelocity = rb.linearVelocity.normalized * maxThrust;
+            }
+        }
+
+        if (Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            boosterFlame.SetActive(true);
+        }
+        else if (Mouse.current.leftButton.wasReleasedThisFrame)
+        {
+            boosterFlame.SetActive(false);
         }
     }
 
