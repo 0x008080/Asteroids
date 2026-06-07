@@ -1,11 +1,14 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
 {
     private float elapsedTime = 0f;
     private float score = 0f;
+    private Label scoreText;
+    private Button restartButton;
 
     public float scoreMuliplier = 10f;
     public float thrustForce = 1f;
@@ -13,7 +16,7 @@ public class PlayerController : MonoBehaviour
 
     public GameObject boosterFlame;
     public UIDocument uiDocument;
-    private Label scoreText;
+    public GameObject explosionEffect;
 
     Rigidbody2D rb;
 
@@ -22,6 +25,9 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         scoreText = uiDocument.rootVisualElement.Q<Label>("ScoreLabel");
+        restartButton = uiDocument.rootVisualElement.Q<Button>("RestartButton");
+        restartButton.style.display = DisplayStyle.None;
+        restartButton.clicked += ReloadScene;
     }
 
     // Update is called once per frame
@@ -33,14 +39,16 @@ public class PlayerController : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        // Destroy(gameObject);
+        Destroy(gameObject);
+        Instantiate(explosionEffect, transform.position, transform.rotation);
+        restartButton.style.display = DisplayStyle.Flex;
+        restartButton.clicked += ReloadScene;
     }
 
     void UpdateScore()
     {
         elapsedTime += Time.deltaTime;
         score = Mathf.FloorToInt(elapsedTime * scoreMuliplier);
-        Debug.Log("Score: " + score);
         scoreText.text = "Score: " + score;
     }
 
@@ -70,5 +78,10 @@ public class PlayerController : MonoBehaviour
         {
             boosterFlame.SetActive(false);
         }
+    }
+
+    void ReloadScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
